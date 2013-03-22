@@ -86,7 +86,7 @@ PRODUCT_COPY_FILES += \
 
 # Wifi
 PRODUCT_COPY_FILES += \
-    device/lge/l1m/prebuilt/etc/wifi/bcmdhd:/system/etc/wifi/bcmdhd.cal \
+    device/lge/l1m/prebuilt/etc/wifi/bcmdhd.cal:/system/etc/wifi/bcmdhd.cal \
     device/lge/l1m/prebuilt/etc/wifi/wpa_supplicant.conf:/system/etc/wifi/wpa_supplicant.conf
 
 # Audio
