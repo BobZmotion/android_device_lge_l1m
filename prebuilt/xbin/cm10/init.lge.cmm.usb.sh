@@ -31,7 +31,7 @@
 #
 # When boot is completed and persist.sys.usb.config is "boot",
 # set persist.sys.usb.config into default mode.
-# default mode of LGU is mtp only.
+# default mode of MetroPCS is mtp only.
 #
 
 usb_config=`getprop persist.sys.usb.config`

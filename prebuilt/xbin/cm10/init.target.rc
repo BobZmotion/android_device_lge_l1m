@@ -38,34 +38,20 @@ service qcamerasvr /system/bin/mm-qcamera-daemon
         class late_start
         user system
         group system camera inet
-
+# LGE_CHANGE to disable ISAGNav, if necessary copy these to \android\device\lge\each_model\init.each_model.rc
 #start GNSS/Sensor interface daemon
-service gsiff_daemon /system/bin/gsiff_daemon
-    class late_start
-    user system
-    group qcom_oncrpc
-
-on early-init
-    mkdir /mnt 0775 root system
-
-    mkdir /storage 0555 system sdcard_r
-    mkdir /storage/sdcard0 0000 system system
-    mkdir /storage/sdcard1 0000 system system
-
-    # for backwards compatibility
-    symlink /storage/sdcard0 /sdcard
-    symlink /storage/sdcard0 /mnt/sdcard
-    symlink /storage/sdcard1 /external_sd
-    symlink /storage/sdcard1 /mnt/external_sd
-
-    export EXTERNAL_STORAGE /storage/sdcard0
+#service gsiff_daemon /system/bin/gsiff_daemon
+#    class late_start
+#    user system
+#   group gps qcom_oncrpc net_raw
 
 # LGE_CHANGE For MTP
 on init
-    export EXTERNAL_ADD_STORAGE /storage/sdcard1
+    export EXTERNAL_ADD_STORAGE /mnt/sdcard/external_sd
+#    mkdir /mnt/sdcard/external_sd 0000 system system
 
 # on emmc mount the partition containing firmware
-on fs
+on emmc-fs
 
 # Create mount point for LG Specific functions
    mkdir /sns 0771 system system
@@ -88,8 +74,9 @@ on fs
 #LGE_CHANGE_S, [jiseok.kang], 2011-02-10, NON-HLOS image file permission
    mount vfat /dev/block/mmcblk0p1 /firmware ro umask=002 shortname=lower
 #LGE_CHANGE_E, [jiseok.kang], 2011-02-10, NON-HLOS image file permission
-#   exec /system/bin/sh /system/etc/init.qcom.modem_links.sh
-#   exec /system/bin/sh /system/etc/init.qcom.mdm_links.sh
+   exec /system/bin/sh /system/etc/init.qcom.modem_links.sh
+   exec /system/bin/sh /system/etc/init.qcom.mdm_links.sh
+   exec /system/bin/sh /system/etc/init.qcom.thermald_conf.sh
 
 # LGE_CHANGE For MISC
 # vibrator
@@ -98,13 +85,16 @@ on fs
 # LGE_CHANGE For MISC
 
 on post-fs
-#   mount ext4 /dev/block/platform/msm_sdcc.1/by-name/system /system ro remount barrier=1
-
+   mount ext4 /dev/block/platform/msm_sdcc.1/by-name/system /system ro remount barrier=1
 # NFC Feature
    chmod 0666 /dev/pn544
+   setprop ro.nfc.port I2C
+# LGE_CHANGE For MTP
+#when using fuse sdcard, it's needed for mounting for crypt fs.
    setprop ro.crypto.fuse_sdcard true
 
 on post-fs-data
+# LGE_CHANGE_S For DRM
 # on post-fs-data //already defined MTP
     chown system system /persist-lg
     chmod 0771 /persist-lg
@@ -154,7 +144,7 @@ on post-fs-data
 # LGE_CHANGE, LGE_UPDATE_S
 # The support of external sd
 # 2012-03-05 G1-FS@lge.com
-#    mkdir /data/media/external_sd 0000 system system
+    mkdir /data/media/external_sd 0000 system system
 # LGE_UPDATE_E
 
 # LGE_CHANGE For MLT
@@ -168,8 +158,9 @@ service sdcard /system/bin/sdcard /data/media 1023 1023
     class late_start
 
 on boot
-   symlink /mnt/external_sd /mnt/sdcard/external_sd
-   write /sys/devices/i2c-3/3-0024/cyttsp_update_fw 1
+#   write /sys/devices/i2c-3/3-0024/cyttsp_update_fw 1
+#   write /sys/devices/i2c-3/3-005b/update_fw 1
+#   write /sys/devices/i2c-3/3-004a/update_fw 1
    start qcamerasvr
    
 # LGE_CHAGE_S, 20120308, inmo.nam@lge.com, For Log Service
@@ -212,19 +203,48 @@ service mpdecision /system/bin/mpdecision --no_sleep --avg_comp
    user root
    disabled
 
+service qosmgrd /system/bin/qosmgr /system/etc/qosmgr_rules.xml --no_android_log
+   user system
+   group system
+   disabled
+
+service kickstart /system/bin/qcks l
+    oneshot
+    disabled
+
+service mdm_helper /system/bin/mdm_helper
+    class main
+    oneshot
+    disabled
+
+#service qrngd /system/bin/qrngd -f
+#   class main
+#   user system
+#   group system
+
 service qseecomd /system/bin/qseecomd
    class late_start
    user system
    group system
 
+# Start kickstart if mdm is detected
+on property:ro.baseband=mdm
+    mkdir /data/qcks 0770 system system
+    start kickstart
+
+# Load SMUX line discipline for Fusion 4
+on property:ro.baseband=sglte
+    exec /system/bin/n_smux /dev/ttyHS1
+
+# Start up mdm_helper if sglte detected
+on property:ro.baseband=sglte
+    start mdm_helper
+
 # LGE_CHANGE_S, Add atd service
 service atd /system/bin/atd /dev/ttyGS0 /dev/smd0
-   class main
-   socket atd stream 0660 system inet
-   disabled
+   class core
+   socket atd stream 0660 system inet   
 
-on property:ro.baseband="msm"
-   start atd
 # LGE_CHANGE_E
 
 on chargerlogo_adbd
@@ -241,6 +261,139 @@ on chargerlogo_adbd
     write /sys/class/android_usb/android0/enable 1
     start adbd
 
+on chargerlogo
+   stop bootlogo
+   write /sys/module/rpm_resources/enable_low_power/L2_cache 1
+   write /sys/module/rpm_resources/enable_low_power/pxo 1
+   write /sys/module/rpm_resources/enable_low_power/vdd_dig 1
+   write /sys/module/rpm_resources/enable_low_power/vdd_mem 1
+   write /sys/module/pm_8x60/modes/cpu0/power_collapse/suspend_enabled 1
+   write /sys/module/pm_8x60/modes/cpu1/power_collapse/suspend_enabled 1
+   write /sys/module/pm_8x60/modes/cpu0/power_collapse/idle_enabled 1
+   write /sys/module/pm_8x60/modes/cpu1/power_collapse/idle_enabled 1
+   exec /sbin/chargerlogo
+service usf_tester /system/bin/usf_tester
+    user system
+    group system inet
+    disabled
+
+service usf_epos /system/bin/usf_epos
+    user system
+    group system inet
+    disabled
+
+service usf_gesture /system/bin/usf_gesture
+    user system
+    group system inet
+    disabled
+
+service usf_p2p /system/bin/usf_p2p
+    user system
+    group system inet
+    disabled
+
+service usf_hovering /system/bin/usf_hovering
+    user system
+    group system inet
+    disabled
+
+#service usf-post-boot /system/bin/sh /system/etc/usf_post_boot.sh
+#    class late_start
+#    user root
+#    disabled
+
+# LGE_CHANGE_S, [blue.park@lge.com] <For Log Service>
+   service logging_prepare /system/bin/sh /etc/logging_prepare.sh
+    disabled
+    oneshot
+
+on property:persist.service.logging_prepare=1
+    start logging_prepare
+
+on property:persist.service.logging_prepare=0
+    stop logging_prepare
+
+service logging_android /system/bin/sh /etc/logging_android.sh
+    disabled
+
+on property:persist.service.logging_android=1
+    start logging_android
+
+on property:persist.service.logging_android=0
+    stop logging_android
+
+service logging_kernel /system/bin/sh /etc/logging_kernel.sh
+    disabled
+
+on property:persist.service.logging_kernel=1
+    start logging_kernel
+
+on property:persist.service.logging_kernel=0
+    stop logging_kernel
+
+#LGE_CHANGE_E, <For Log Service>
+
+#LGE_CHANGE_S, 20120308, inmo.nam@lge.com, For Log Service
+service alogging_main /system/bin/sh /etc/logging_android_apart.sh main
+	disabled
+#  class late_start
+
+on property:persist.service.alogging_main=1
+	start alogging_main
+
+on property:persist.service.alogging_main=0
+	stop alogging_main
+
+service alogging_system /system/bin/sh /etc/logging_android_apart.sh system
+	disabled
+#  class late_start
+
+on property:persist.service.alogging_system=1
+	start alogging_system
+
+on property:persist.service.alogging_system=0
+	stop alogging_system
+
+service alogging_radio /system/bin/sh /etc/logging_android_apart.sh radio
+	class late_start
+	disabled
+
+on property:persist.service.alogging_radio=1
+	start alogging_radio
+
+on property:persist.service.alogging_radio=0
+	stop alogging_radio
+
+service alogging_events /system/bin/sh /etc/logging_android_apart.sh events
+	class late_start
+	disabled
+
+on property:persist.service.alogging_events=1
+	start alogging_events
+
+on property:persist.service.alogging_events=0
+	stop alogging_events
+
+service alogging_kernel /system/bin/sh /etc/logging_kernel_apart.sh
+	class late_start
+	disabled
+
+on property:persist.service.alogging_kernel=1
+	start alogging_kernel
+
+on property:persist.service.alogging_kernel=0
+	stop alogging_kernel
+
+#LGE_CHANGE_E, inmo.nam@lge.com, For Log Service
+
+# [START_LGE_HiddenMenu], ADD, seungin.choi@lge.com, 2012-02-07, Add Fake_Battery
+service fake_batt /system/bin/sh /data/fake_batt.sh
+    class late_start
+    user system
+    group system
+    oneshot
+# [START_LGE_HiddenMenu], ADD, seungin.choi@lge.com, 2012-02-07, Add Fake_Battery
+
 on property:init.svc.bootanim=stopped
     write /sys/module/lge_handle_panic/parameters/on_hidden_reset 0
-
+    start usf-post-boot

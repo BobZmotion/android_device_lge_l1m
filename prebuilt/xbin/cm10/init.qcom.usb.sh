@@ -27,16 +27,19 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# Allow unique persistent serial numbers for devices connected via usb
-# User needs to set unique usb serial number to persist.usb.serialno and
-# if persistent serial number is not set then Update USB serial number if
-# passed from command line
+# Update USB serial number passed from kernel command line, if it is not
+# then use unique persistent serial number for device connected via usb.
+# User needs to set unique usb serial number to persist.usb.serialno
 #
-serialno=`getprop persist.usb.serialno`
+serialno=`getprop ro.serialno`
 case "$serialno" in
     "")
-    serialnum=`getprop ro.serialno`
-    echo "$serialnum" > /sys/class/android_usb/android0/iSerial
+    serialnum=`getprop persist.usb.serialno`
+    case "$serialnum" in
+        "");; #Do nothing, use default serial number
+        *)
+        echo "$serialnum" > /sys/class/android_usb/android0/iSerial
+    esac
     ;;
     * )
     echo "$serialno" > /sys/class/android_usb/android0/iSerial
@@ -65,6 +68,16 @@ case "$usbchgdisabled" in
     esac
 esac
 
+usbcurrentlimit=`getprop persist.usb.currentlimit`
+case "$usbcurrentlimit" in
+    "") ;; #Do nothing here
+    * )
+    case $target in
+        "msm8960")
+        echo "$usbcurrentlimit" > /sys/module/pm8921_charger/parameters/usb_max_current
+	;;
+    esac
+esac
 #
 # Allow USB enumeration with default PID/VID
 #
@@ -74,21 +87,19 @@ usb_config=`getprop persist.sys.usb.config`
 case "$usb_config" in
     "" | "adb") #USB persist config not set, select default configuration
         case $target in
+            "copper")
+                setprop persist.sys.usb.config diag,adb
+                ;;
             "msm8960")
-                socid=`cat /sys/devices/system/soc/soc0/id`
-                case "$socid" in
-                    "109")
-                         setprop persist.sys.usb.config diag,adb
+                case "$baseband" in
+                    "mdm")
+                         setprop persist.sys.usb.config diag,diag_mdm,serial_hsic,serial_tty,rmnet_hsic,mass_storage,adb
+                    ;;
+                    "sglte")
+                         setprop persist.sys.usb.config diag,diag_mdm,serial_smd,serial_tty,serial_hsuart,rmnet_hsuart,mass_storage,adb
                     ;;
                     *)
-                        case "$baseband" in
-                            "mdm")
-                                 setprop persist.sys.usb.config diag,diag_mdm,serial_hsic,serial_tty,rmnet_hsic,mass_storage,adb
-                            ;;
-                            *)
-                                 setprop persist.sys.usb.config diag,serial_smd,serial_tty,rmnet_bam,mass_storage,adb
-                            ;;
-                        esac
+                         setprop persist.sys.usb.config diag,serial_smd,serial_tty,rmnet_bam,mass_storage,adb
                     ;;
                 esac
             ;;
