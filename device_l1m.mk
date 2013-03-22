@@ -301,7 +301,7 @@ PRODUCT_COPY_FILES += \
     device/lge/l1m/prebuilt/lib/libOlaFaceDetector.so:system/lib/libOlaFaceDetector.so \
     device/lge/l1m/prebuilt/lib/libOlaLGECameraJNI.so:system/lib/libOlaLGECameraJNI.so \
     device/lge/l1m/prebuilt/lib/libOmxAacDec.so:system/lib/libOmxAacDec.so \
-    device/lge/l1m/prebuilt/lib/libOmxVdecDec.so:system/lib/libOmxVdecDec.so \
+    device/lge/l1m/prebuilt/lib/libOmxVdec.so:system/lib/libOmxVdec.so \
     device/lge/l1m/prebuilt/lib/libOmxWmaDec.so:system/lib/libOmxWmaDec.so \
     device/lge/l1m/prebuilt/lib/libOpenCL.so:system/lib/libOpenCL.so \
     device/lge/l1m/prebuilt/lib/libOpenVG.so:system/lib/libOpenVG.so \
