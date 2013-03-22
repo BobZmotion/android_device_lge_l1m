@@ -1,0 +1,181 @@
+#
+# system.prop for surf
+#
+
+rild.libpath=/system/lib/libril-qc-qmi-1.so
+rild.libargs=-d /dev/smd0
+persist.rild.nitz_plmn=
+persist.rild.nitz_long_ons_0=
+persist.rild.nitz_long_ons_1=
+persist.rild.nitz_long_ons_2=
+persist.rild.nitz_long_ons_3=
+persist.rild.nitz_short_ons_0=
+persist.rild.nitz_short_ons_1=
+persist.rild.nitz_short_ons_2=
+persist.rild.nitz_short_ons_3=
+ril.subscription.types=NV,RUIM
+DEVICE_PROVISIONED=1
+debug.sf.hw=1
+debug.egl.hw=1
+debug.composition.type=dyn
+debug.compbypass.enable=1
+dalvik.vm.heapsize=36m
+debug.enable.wl_log=0
+
+# system props for the cne module
+persist.cne.bat.range.low.med=30
+persist.cne.bat.range.med.high=60
+persist.cne.loc.policy.op=/system/etc/OperatorPolicy.xml
+persist.cne.loc.policy.user=/system/etc/UserPolicy.xml
+persist.cne.bwbased.rat.sel=false
+persist.cne.snsr.based.rat.mgt=false
+persist.cne.bat.based.rat.mgt=false
+persist.cne.rat.acq.time.out=30000
+persist.cne.rat.acq.retry.tout=0
+persist.cne.feature=0
+
+lpa.decode=false
+lpa.use-stagefright=true
+
+#system props for the MM modules
+media.stagefright.enable-player=true
+media.stagefright.enable-http=true
+media.stagefright.enable-aac=true
+media.stagefright.enable-qcp=true
+media.stagefright.enable-fma2dp=true
+media.stagefright.enable-scan=true
+mmp.enable.3g2=true
+
+# system props for the data modules
+ro.use_data_netmgrd=true
+
+#system props for time-services
+persist.timed.enable=true
+
+# System props for audio
+persist.audio.fluence.mode=endfire
+persist.audio.vr.enable=false
+persist.audio.handset.mic=digital
+
+# System prop to select audio resampler quality
+af.resampler.quality=255
+
+# System prop to select MPQAudioPlayer by default on mpq8064
+mpq.audio.decode=true
+
+# system prop for opengles version
+ro.opengles.version=131072
+
+# system property for Bluetooth Handsfree Profile Wide Band Speech
+ro.qualcomm.bluetooth.hfp.wbs=true
+
+#system prop for Bluetooth hci transport
+ro.qualcomm.bt.hci_transport=smd
+
+# system prop for requesting Master role in incoming Bluetooth connection.
+#
+ro.bluetooth.request.master=false
+
+# system prop for Bluetooth Auto connect for remote initated connections
+#
+ro.bluetooth.remote.autoconnect=true
+
+#system prop for switching gps driver to qmi
+persist.gps.qmienabled=true
+
+# System property for cabl
+ro.qualcomm.cabl=2
+
+# System prop for sending transmit power request to RIL during WiFi hotspot on/off
+#
+ro.ril.transmitpower=true
+
+ro.hwui.text_cache_width=2048
+
+#snapdragon value add features
+ro.qc.sdk.camera.facialproc=false
+
+# System property for gesture sensors. System property to turn on gesture alway
+ro.qc.sdk.sensors.gestures=true
+
+#
+# ADDITIONAL_BUILD_PROPERTIES
+#
+ro.lge.swversion_short=V00a
+ro.lge.swversion_rev=05
+ro.lge.swversion=MS87010a
+ro.build.target_operator=MPCS
+ro.build.target_country=US
+ro.config.ringtone=Lifes_Good.ogg
+ro.config.notification_sound=Optimus.ogg
+ro.config.alarm_alert=Lifes_Good_Alarm.ogg
+ro.com.google.clientidbase=android-om-lge
+ro.com.google.clientidbase.ms=android-metropcs-us
+ro.com.google.clientidbase.yt=android-om-lge
+ro.com.google.clientidbase.am=android-om-lge
+ro.com.google.clientidbase.gmm=android-om-lge
+lgemm.player.use_android_origin=false
+ro.afwdata.LGfeatureset=MPCSBASE
+wifi.lge.sleeppolicy=0
+wifi.lge.offdelay=true
+persist.data_netmgrd_mtu=1428
+ro.config.vc_call_vol_steps=6
+ro.config.vc_call_vol_default=3
+persist.service.ecc.hiddenmenu=
+ro.com.google.gmsversion=4.0_r7
+ro.setupwizard.mode=DISABLED
+ro.livewallpaper.map=DISABLED
+ro.com.google.apphider=off
+drm.service.enabled=true
+ro.telephony.default_network=0
+ro.sf.lcd_density=240
+ro.lge.lcd_default_brightness=162
+ro.lge.lcd_auto_brightness_mode=false
+ro.lge.lcd_target_display=qhd
+ro.hdmi.enable=false
+wlan.chip.vendor=brcm
+wlan.chip.version=bcm4334
+wifi.supplicant_scan_interval=20
+wifi.lge.patch=true
+wifi.lge.hanglessid=false
+wifi.lge.offloading=false
+wifi.lge.mhp=false
+persist.radio.apm_sim_not_pwdn=1
+ro.cdma.home.operator.alpha=MetroPCS
+ro.cdma.home.operator.numeric=311660
+dalvik.vm.heapstartsize=8m
+dalvik.vm.heapgrowthlimit=96m
+dalvik.vm.heapsize=256m
+dhcp.dlna.using=false
+lpa.decode=true
+keyguard.no_require_sim=true
+ro.vendor.extension_library=/system/lib/libqc-opt.so
+lge.signed_image=true
+persist.radio.data_no_toggle=1
+ro.lge.audio_soundexception=true
+ro.lge.audio_soundprofile=true
+dalvik.vm.heaputilization=0.25
+dalvik.vm.heapidealfree=8388608
+dalvik.vm.heapconcurrentstart=2097152
+ro.lge.capp_optimusui=true
+ro.lge.capp_core=true
+ro.lge.capp_drm=true
+ro.lge.capp_divx_drm=true
+ro.lge.capp_almond=true
+ro.lge.capp_bubble_popup=true
+ro.lge.capp_resource=true
+ro.lge.capp_wapservice=true
+ro.lge.capp_osp=true
+ro.lge.capp_key_light_off=true
+ro.lge.capp_key_exception=true
+ro.lge.capp_keyled_timeout=true
+ro.lge.capp_quickclip_key=true
+ro.lge.capp_menu_long=true
+ro.lge.capp_touch_scroller=true
+ro.lge.capp_touch_ldi=true
+ro.lge.capp_mdm=true
+ro.lge.capp_lockscreen=true
+ro.lge.fonts=true
+ro.lge.capp_ghost_finger=true
+net.bt.name=Android
+dalvik.vm.stack-trace-file=/data/anr/traces.txt
