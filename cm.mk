@@ -10,7 +10,7 @@ TARGET_BOOTANIMATION_NAME := vertical-320x480
 $(call inherit-product, vendor/cm/config/common_full_phone.mk)
 
 # Inherit device configuration
-$(call inherit-product, device/lge/l1m/device_l0.mk)
+$(call inherit-product, device/lge/l1m/device_l1m.mk)
 
 # Device naming
 PRODUCT_DEVICE := l1m
